@@ -1,0 +1,6 @@
+{
+  "name": "AI Travel Assistant",
+  "description": "AI travel planning assistant with multi-agent flight offers, hotel search, activities, weather forecast, and day-by-day itinerary synthesis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
