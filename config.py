@@ -45,11 +45,19 @@ OPENTRIPMAP_API_KEY: str = os.getenv("OPENTRIPMAP_API_KEY", "")
 OPENWEATHER_API_KEY: str = os.getenv("OPENWEATHER_API_KEY", "")
 
 # ---------------------------------------------------------------------------
-# LangSmith tracing (optional)
+# LangSmith / LangChain tracing
 # ---------------------------------------------------------------------------
-LANGCHAIN_TRACING_V2: str = os.getenv("LANGCHAIN_TRACING_V2", "false")
-LANGCHAIN_API_KEY: str = os.getenv("LANGCHAIN_API_KEY", "")
-LANGCHAIN_PROJECT: str = os.getenv("LANGCHAIN_PROJECT", "travel-assistant-hackathon")
+LANGCHAIN_TRACING_V2: str = os.getenv("LANGSMITH_TRACING") or os.getenv("LANGCHAIN_TRACING_V2", "false")
+LANGCHAIN_API_KEY: str = os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY", "")
+LANGCHAIN_PROJECT: str = os.getenv("LANGSMITH_PROJECT") or os.getenv("LANGCHAIN_PROJECT", "ai-travel-assistant")
+LANGCHAIN_ENDPOINT: str = os.getenv("LANGSMITH_ENDPOINT") or os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com")
+
+# Ensure LangChain library auto-picks up tracing from environment
+if LANGCHAIN_API_KEY and LANGCHAIN_TRACING_V2.lower() == "true":
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
+    os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
+    os.environ["LANGCHAIN_ENDPOINT"] = LANGCHAIN_ENDPOINT
 
 # ---------------------------------------------------------------------------
 # Derived helpers
@@ -57,6 +65,10 @@ LANGCHAIN_PROJECT: str = os.getenv("LANGCHAIN_PROJECT", "travel-assistant-hackat
 def llm_provider() -> str:
     """Return 'groq' when a Groq key is present, 'ollama' otherwise."""
     return "groq" if GROQ_API_KEY else "ollama"
+
+
+def langsmith_configured() -> bool:
+    return bool(LANGCHAIN_API_KEY) and LANGCHAIN_TRACING_V2.lower() == "true"
 
 
 def duffel_configured() -> bool:
